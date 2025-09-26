@@ -1,0 +1,49 @@
+import mysql.connector
+from mysql.connector import Error
+
+class Conexion_DB:
+    HOST = 'localhost'
+    USER = 'root'
+    PASSWORD = '1234'
+    DATABASE = 'db_verificador'
+
+    conexion = None
+
+    @classmethod
+    def conectar(cls):
+        try:
+            cls.conexion = mysql.connector.connect(
+                host=cls.HOST,
+                user=cls.USER,
+                password=cls.PASSWORD,
+                database=cls.DATABASE
+            )
+            if cls.conexion.is_connected():
+                print("Conexión a MySQL a realizada")
+        except Error as e:
+            raise ValueError(f"Error conectando a MySQL: {e}")
+    @classmethod
+    def cerrar(cls):
+        if cls.conexion and cls.conexion.is_connected():
+            cls.conexion.close()
+            cls.conexion = None
+            print("Conexión cerrada")
+    @classmethod
+    def ejecutar_sin_retorno(cls, query, parametros=None):
+        cursor = None
+        try:
+            print("->", query, "<-")
+            cursor = cls.conexion.cursor()
+            # En mysql-connector los parámetros van como %s
+            cursor.execute(query, parametros or [])
+            cls.conexion.commit()
+            return True
+        except Exception as e:
+            if cls.conexion.in_transaction:  
+                cls.conexion.rollback()
+            raise ValueError(f"Error ejecutando query: {e}")
+        finally:
+            if cursor:
+                cursor.close()
+
+
