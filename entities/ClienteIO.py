@@ -17,11 +17,13 @@ class ClienteIO:
         self.correo = CampoIO()
         self.telefono = CampoIO()
         self.direccion = CampoIO()
+        
 
     def recibir_JSON(self, json_str):
         # Convierte el string JSON a diccionario
         try:
             datos = json.loads(json_str)
+            self.json=datos#<- guarda e dicioanrio json en un atributo
         except json.JSONDecodeError:
             raise ValueError("JSON no válido")
         
@@ -29,7 +31,7 @@ class ClienteIO:
         print(json.dumps(datos, indent=4, ensure_ascii=False))
 
         # Asigna los valores recibidos a cada atributo
-        self.tipoMantenimiento.valor = int(datos.get("TipoMantenimiento", ""))
+        self.tipoMantenimiento.valor =(datos.get("op_code", ""))
         self.cedula.valor = datos.get("Cedula", "")
         self.pais.valor = datos.get("Pais", "")
         self.nombre.valor = datos.get("Nombre", "")
