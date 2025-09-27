@@ -24,7 +24,7 @@ class ClienteIO:
             datos = json.loads(json_str)
         except json.JSONDecodeError:
             raise ValueError("JSON no válido")
-
+        
         print("📦 JSON recibido:")
         print(json.dumps(datos, indent=4, ensure_ascii=False))
 

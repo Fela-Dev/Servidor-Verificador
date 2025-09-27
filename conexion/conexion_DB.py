@@ -1,4 +1,4 @@
-import mysql.connector
+import mysql.connector#py -m pip install mysql-connector-python
 from mysql.connector import Error
 
 class Conexion_DB:

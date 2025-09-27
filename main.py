@@ -1,6 +1,7 @@
 import socket
 import os
 import threading
+import json
 
 
 from conexion.conexion_DB import Conexion_DB 
@@ -14,17 +15,26 @@ def manejar_cliente(client_socket, client_address):
         print(f"Conexión aceptada de {client_address}")
 
         try:
-            cliente = ClienteIO()
+            
 
             # Recibir datos
+            import json
+
             data = client_socket.recv(1024).decode()
             print(f"Recibido del cliente: {data}")
-            
-            # Procesar informacion
-            cliente.recibir_JSON(data)
-            cliente.ejecutar_consulta()
-            # consultas = Consultas_CLiente()
-            # resultado = consultas.verificar(data)
+
+            # Convertir string JSON a diccionario
+            data_json = json.loads(data)
+
+            tipo_solicitud = data_json.get("TipoMantenimiento")
+
+            if tipo_solicitud <= 1 or tipo_solicitud >= 3:
+                cliente = ClienteIO()
+                # Procesar información
+                cliente.recibir_JSON(data)   # <-- ahora le pasas un dict
+                cliente.ejecutar_consulta()
+                # consultas = Consultas_CLiente()
+                            # resultado = consultas.verificar(data)
 
             
 
@@ -50,15 +60,17 @@ def main():
 
     # Crear socket del servidor solo una vez
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind(("localhost", 6666))
+    server_socket.bind(("192.168.100.16", 6666))
     server_socket.listen(10)
     print("Servidor escuchando en localhost:6666...")
 
     while True:
         # Aceptar conexión
         client_socket, client_address = server_socket.accept()
+        
 
         # Crear hilo para manejar al cliente
+
         hilo = threading.Thread(target=manejar_cliente, args=(client_socket, client_address))
         hilo.start()
 
