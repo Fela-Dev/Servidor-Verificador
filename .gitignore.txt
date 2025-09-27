@@ -1,0 +1,7 @@
+# Ignorar __pycache__ y archivos .pyc
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+# Ignorar configuración de Visual Studio
+.vs/
