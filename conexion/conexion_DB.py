@@ -28,6 +28,7 @@ class Conexion_DB:
             cls.conexion.close()
             cls.conexion = None
             print("Conexión cerrada")
+    
     @classmethod
     def ejecutar_sin_retorno(cls, query, parametros=None):
         cursor = None
@@ -42,6 +43,29 @@ class Conexion_DB:
             if cls.conexion.in_transaction:  
                 cls.conexion.rollback()
             raise ValueError(f"Error ejecutando query: {e}")
+        finally:
+            if cursor:
+                cursor.close()
+    
+    @classmethod
+    def ejecutar_con_retorno(cls, sp_name, parametros=None):
+        """
+        Ejecuta un stored procedure que devuelve valores mediante parámetros OUT.
+        :param sp_name= nombre del stored procedure
+        :param parametros: lista de parámetros, incluso NOne
+        :return: lista de valores de los parámetros qu regresa el sp
+        """
+        cursor = None
+        try:
+            cursor = cls.conexion.cursor()
+            # Llamada al stored procedure
+            result_params = cursor.callproc(sp_name, parametros or [])
+            cls.conexion.commit()
+            return result_params  # Devuelve la lista con valores actualizados, incluyendo OUT
+        except Exception as e:
+            if cls.conexion.in_transaction:
+                cls.conexion.rollback()
+            raise ValueError(f"Error ejecutando stored procedure: {e}")
         finally:
             if cursor:
                 cursor.close()

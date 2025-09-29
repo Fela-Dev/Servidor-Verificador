@@ -5,7 +5,9 @@ import json
 
 from conf import Config
 from conexion.conexion_DB import Conexion_DB 
+
 from entities.ClienteIO import ClienteIO
+from entities.RegistroVenta import RegistroVentaIO
 nucleos = os.cpu_count()
 semaforo = threading.Semaphore(nucleos)
 def inicio_servidor():
@@ -57,28 +59,31 @@ def manejar_cliente(client_socket, client_address):
             tipo_solicitud = data_json.get("op_code")
 
             if tipo_solicitud <= 1 or tipo_solicitud <= 3:
-                cliente = ClienteIO()
+                solicitud_cliente = ClienteIO()
                 # Procesar información
-                cliente.recibir_JSON(data)   # <-- ahora le pasas un dict
-                cliente.ejecutar_consulta()
+                solicitud_cliente.recibir_JSON(data_json)   # <-- ahora le pasas un dict
+                solicitud_cliente.ejecutar_consulta()
                 # consultas = Consultas_CLiente()
-                            # resultado = consultas.verificar(data)
+                # resultado = consultas.verificar(data)
             elif(tipo_solicitud==5):
-                cliente = ClienteIO()
-                cliente.mensaje="Funcion insertar factura aun no implmentada"
+                solicitud_cliente = RegistroVentaIO()
+                solicitud_cliente.recibir_JSON(data_json)
+                solicitud_cliente.ejecutar_consulta() 
+                
+                #solicitud_cliente.mensaje="Funcion insertar factura aun no implmentada"
             else:
-                cliente = ClienteIO()
-                cliente.mensaje=(f"comando {tipo_solicitud} no corresponde a ninguna funcionalidad")
+                solicitud_cliente = ClienteIO()
+                solicitud_cliente.mensaje=(f"comando {tipo_solicitud} no corresponde a ninguna funcionalidad")
 
             
 
         except Exception as e:
-            cliente.armar_respuesta_error(str(e))
+            solicitud_cliente.armar_respuesta_error(str(e))
             print(f"Error con {client_address}: {e}")
 
         finally:
             #Enviar respuesta
-            mensaje=cliente.mensaje
+            mensaje=solicitud_cliente.mensaje
             client_socket.send(mensaje.encode())
             client_socket.close()
             print(f"Conexión con {client_address} cerrada")

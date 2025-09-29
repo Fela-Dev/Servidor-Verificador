@@ -1,4 +1,5 @@
 import json
+from modulos.validaciones_cliente import Validaciones_Cliente
 from conexion.consultas_cliente import Consultas_CLiente 
 class CampoIO:
     def __init__(self, valor="", status="", mensaje=""):
@@ -19,27 +20,23 @@ class ClienteIO:
         self.direccion = CampoIO()
         
 
-    def recibir_JSON(self, json_str):
+    def recibir_JSON(self, json):
+        validaciones = Validaciones_Cliente()
         # Convierte el string JSON a diccionario
-        try:
-            datos = json.loads(json_str)
-            self.json=datos#<- guarda e dicioanrio json en un atributo
-        except json.JSONDecodeError:
-            raise ValueError("JSON no válido")
         
-        print("📦 JSON recibido:")
-        print(json.dumps(datos, indent=4, ensure_ascii=False))
-
+        
         # Asigna los valores recibidos a cada atributo
-        self.tipoMantenimiento.valor =(datos.get("op_code", ""))
-        self.cedula.valor = datos.get("Cedula", "")
-        self.pais.valor = datos.get("Pais", "")
-        self.nombre.valor = datos.get("Nombre", "")
-        self.primerApellido.valor = datos.get("PrimerApellido", "")
-        self.segundoApellido.valor = datos.get("SegundoApellido", "")
-        self.correo.valor = datos.get("Correo", "")
-        self.telefono.valor = datos.get("Telefono", "")
-        self.direccion.valor = datos.get("Direccion", "")
+        self.tipoMantenimiento.valor =(json.get("op_code", ""))
+        self.cedula.valor = json.get("Cedula", "")
+        self.pais.valor = json.get("Pais", "")
+        self.nombre.valor = json.get("Nombre", "")
+        self.primerApellido.valor = json.get("PrimerApellido", "")
+        self.segundoApellido.valor = json.get("SegundoApellido", "")
+        self.correo.valor = json.get("Correo", "")
+        self.telefono.valor = json.get("Telefono", "")
+        self.direccion.valor = json.get("Direccion", "")
+        # valida datos
+        validaciones.ValidarCliente(self)
     def generar_lista(self):
         """
         lista de etributos:Funciones de consulta

@@ -3,6 +3,8 @@ import psutil
 
 class Config:
     ip_puerto="localhost"
+    puerto_clientes_ventas="6666"
+    
     
     guia_comandos="""
     Lista de de funciones del servidor
